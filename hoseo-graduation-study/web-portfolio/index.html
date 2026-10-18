@@ -1,0 +1,639 @@
+<title>웹 포트폴리오 스튜디오</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Framer로 졸업작품 사이트를 만들고 게시하는 단계별 강의 자료">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@600;800&display=swap">
+<style>
+/* Layout: 도면 시트처럼 읽히는 한 페이지 — 왼쪽 시트 번호 칼럼 + 본문, 학생이 만들 사이트와 같은 순서로 스크롤 */
+:root {
+  --bg: #F3F5F3;
+  --paper: #FFFFFF;
+  --ink: #17221C;
+  --muted: #5A6760;
+  --line: #D5DDD7;
+  --green: #2F6B4F;
+  --green-deep: #1F3A2E;
+  --green-soft: #E3ECE6;
+  --brass: #A9741C;
+  --warn: #A8442E;
+  --grid: rgba(47, 107, 79, 0.07);
+  --display: "Noto Serif KR", "Nanum Myeongjo", Georgia, serif;
+  --body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111814; --paper: #18211C; --ink: #E4ECE6; --muted: #9AA8A0; --line: #2C3832;
+    --green: #7FBF9C; --green-deep: #0C130F; --green-soft: #1F2D25; --brass: #D9A441; --warn: #E2836B;
+    --grid: rgba(127, 191, 156, 0.06); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111814; --paper: #18211C; --ink: #E4ECE6; --muted: #9AA8A0; --line: #2C3832;
+  --green: #7FBF9C; --green-deep: #0C130F; --green-soft: #1F2D25; --brass: #D9A441; --warn: #E2836B;
+  --grid: rgba(127, 191, 156, 0.06); color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.7;
+  word-break: keep-all;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+a { color: var(--green); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible + .box { outline: 2px solid var(--brass); outline-offset: 2px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+p { margin: 0; }
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.label { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--green); }
+
+/* 상단 바 */
+.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--paper); border-bottom: 1px solid var(--line);
+}
+.bar .wrap { display: flex; align-items: center; gap: 20px; padding-block: 10px; }
+.brand { font-weight: 600; font-size: 14px; white-space: nowrap; color: var(--ink); text-decoration: none; }
+.nav { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; min-width: 0; }
+.nav::-webkit-scrollbar { display: none; }
+.nav a {
+  font-family: var(--mono); font-size: 12px; color: var(--muted); text-decoration: none;
+  padding: 6px 10px; border-radius: 999px; white-space: nowrap;
+}
+.nav a:hover, .nav a.on { background: var(--green-soft); color: var(--green); }
+.badge { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--brass); border: 1px solid var(--brass); padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+
+/* 히어로 */
+.hero { padding-block: 72px 56px; }
+.hero .wrap { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 48px; align-items: end; }
+.hero h1 { font-family: var(--display); font-weight: 800; font-size: clamp(36px, 6vw, 64px); line-height: 1.18; letter-spacing: -0.02em; margin-top: 16px; }
+.hero h1 em { font-style: normal; color: var(--green); }
+.hero .lead { margin-top: 20px; font-size: 18px; color: var(--muted); max-width: 34em; }
+.meta { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; color: var(--muted); }
+.meta b { color: var(--ink); font-weight: 600; }
+
+/* 히어로 오른쪽: 학생 사이트 단면 (6개 섹션 적층) */
+.stack { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+.stack .label { display: block; margin-bottom: 12px; }
+.stack ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.stack li { display: grid; grid-template-columns: 88px 1fr; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 6px; background: var(--green-soft); font-size: 14px; }
+.stack li:first-child { background: var(--green); color: var(--paper); padding-block: 22px; }
+.stack li:first-child span { color: var(--paper); opacity: 0.85; }
+.stack li b { font-family: var(--mono); font-weight: 500; font-size: 13px; }
+.stack li span { color: var(--muted); }
+.stack p { margin-top: 12px; font-size: 13px; color: var(--muted); }
+
+/* 섹션 공통: 시트 번호 칼럼 */
+.sheet { padding-block: 64px; border-top: 1px solid var(--line); }
+.sheet .wrap { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 40px; }
+.sheet-no { position: sticky; top: 76px; align-self: start; }
+.sheet-no .num { font-family: var(--display); font-size: 48px; font-weight: 800; color: var(--green); line-height: 1; }
+.sheet-no .label { display: block; margin-top: 10px; color: var(--muted); }
+.sheet h2 { font-family: var(--display); font-weight: 800; font-size: clamp(26px, 3.4vw, 36px); line-height: 1.3; }
+.sheet .intro { margin-top: 12px; color: var(--muted); max-width: 40em; }
+.body { display: grid; gap: 28px; min-width: 0; }
+
+/* 단계 카드 */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: s; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 14px; align-items: start; }
+.steps li::before {
+  content: counter(s); width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center; font-family: var(--mono); font-size: 14px;
+  background: var(--green); color: var(--paper);
+}
+.steps b { display: block; font-weight: 600; }
+.steps span { color: var(--muted); font-size: 15px; }
+
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.tile { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; min-width: 0; }
+.tile h3 { font-size: 17px; font-weight: 600; }
+.tile p { margin-top: 6px; font-size: 15px; color: var(--muted); }
+.tile .label { display: block; margin-bottom: 8px; }
+
+.figures { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.fig { border-left: 2px solid var(--green); padding: 4px 0 4px 16px; }
+.fig strong { display: block; font-family: var(--display); font-size: clamp(24px, 3vw, 32px); font-weight: 800; color: var(--green); line-height: 1.3; }
+.fig span { font-size: 14px; color: var(--muted); }
+
+.note { background: var(--green-soft); border-radius: var(--radius); padding: 18px 20px; font-size: 15px; }
+.note b { color: var(--green); }
+.note.warn { background: transparent; border: 1px solid var(--warn); }
+.note.warn b { color: var(--warn); }
+
+.prompt { display: grid; gap: 10px; background: var(--green-deep); color: #E4ECE6; border-radius: var(--radius); padding: 18px 20px; }
+.prompt .label { color: #9FD0B4; }
+.prompt p { font-family: var(--mono); font-size: 14px; line-height: 1.75; }
+.copy { justify-self: start; font: 500 13px var(--body); color: var(--green-deep); background: #CFE6D8; border: 0; border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+
+.code { font-family: var(--mono); font-size: 14px; background: var(--paper); border: 1px dashed var(--line); border-radius: 6px; padding: 10px 14px; overflow-x: auto; white-space: nowrap; }
+
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 15px; }
+th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--mono); font-weight: 500; font-size: 12px; letter-spacing: 0.06em; color: var(--muted); background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-family: var(--mono); font-weight: 500; color: var(--green); white-space: nowrap; }
+td.miss { color: var(--warn); }
+
+/* 반응형 도식 */
+.devices { display: flex; align-items: flex-end; gap: 18px; flex-wrap: wrap; }
+.dev { display: grid; gap: 6px; justify-items: start; }
+.dev i { display: block; border: 2px solid var(--green); border-radius: 8px; background: var(--paper); }
+.dev.d i { width: 220px; height: 140px; max-width: 100%; }
+.dev.t i { width: 130px; height: 170px; }
+.dev.p i { width: 76px; height: 150px; background: var(--green); }
+.dev b { font-family: var(--mono); font-weight: 500; font-size: 13px; }
+
+/* 체크리스트 */
+.check { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.check label { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px; align-items: start; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; cursor: pointer; font-size: 15px; }
+.check input { position: absolute; opacity: 0; pointer-events: none; }
+.check .box { width: 22px; height: 22px; border: 2px solid var(--green); border-radius: 5px; display: grid; place-items: center; margin-top: 2px; }
+.check input:checked + .box { background: var(--green); }
+.check input:checked + .box::after { content: ""; width: 6px; height: 11px; border: solid var(--paper); border-width: 0 2px 2px 0; transform: rotate(45deg) translate(-1px, -1px); }
+.check input:checked ~ span { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--green); }
+.progress { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.meter { flex: 1 1 200px; height: 8px; background: var(--green-soft); border-radius: 99px; overflow: hidden; }
+.meter i { display: block; height: 100%; width: 0; background: var(--green); transition: width .25s; }
+.progress output { font-family: var(--mono); font-size: 14px; font-variant-numeric: tabular-nums; }
+.reset { font: 500 13px var(--body); background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 6px; padding: 5px 10px; cursor: pointer; }
+.submit { background: var(--green-deep); color: #E4ECE6; border-radius: var(--radius); padding: 18px 20px; font-weight: 600; }
+.submit span { display: block; font-weight: 400; font-size: 14px; color: #A9C2B3; margin-top: 4px; }
+
+/* FAQ */
+details { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); }
+details + details { margin-top: 8px; }
+summary { cursor: pointer; padding: 14px 18px; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; font-family: var(--mono); color: var(--green); }
+details[open] summary::after { content: "−"; }
+details p { padding: 0 18px 16px; color: var(--muted); font-size: 15px; }
+
+/* 과제 */
+.homework { background: var(--green-deep); color: #E4ECE6; padding-block: 64px; }
+.homework .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; align-items: end; }
+.homework .label { color: var(--brass); }
+.homework h2 { font-family: var(--display); font-weight: 800; font-size: clamp(28px, 4vw, 44px); line-height: 1.25; margin-top: 12px; color: #FFFFFF; }
+.homework p { color: #A9C2B3; }
+.homework ol { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+
+footer { padding-block: 40px 56px; font-size: 13px; color: var(--muted); }
+footer .wrap { display: grid; gap: 10px; }
+footer ul { margin: 0; padding-left: 18px; }
+
+@media (max-width: 860px) {
+  .hero .wrap, .homework .wrap { grid-template-columns: minmax(0, 1fr); }
+  .sheet .wrap { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .sheet-no { position: static; display: flex; align-items: baseline; gap: 14px; }
+  .sheet-no .num { font-size: 36px; }
+  .sheet-no .label { margin-top: 0; }
+  .grid3, .check, .figures { grid-template-columns: minmax(0, 1fr); }
+  .badge { display: none; }
+}
+@media (max-width: 560px) {
+  .grid2 { grid-template-columns: minmax(0, 1fr); }
+  .hero { padding-block: 44px 40px; }
+  .sheet { padding-block: 48px; }
+  .brand { display: none; }
+}
+</style>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="#top">웹 포트폴리오 스튜디오</a>
+    <nav class="nav" aria-label="단계 이동">
+      <a href="#goal">기준</a>
+      <a href="#prep">01 준비</a>
+      <a href="#template">02 템플릿</a>
+      <a href="#structure">03 구조</a>
+      <a href="#brand">04 브랜드</a>
+      <a href="#fill">05 채우기</a>
+      <a href="#mobile">06 휴대폰</a>
+      <a href="#settings">07 설정</a>
+      <a href="#publish">08 게시</a>
+      <a href="#qr">09 QR</a>
+      <a href="#checklist">체크</a>
+      <a href="#faq">문제 해결</a>
+    </nav>
+    <span class="badge">검토용 v1</span>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <span class="label">졸업연구 · Web Portfolio · 구축과 게시</span>
+        <h1>내 졸업작품 사이트를<br><em>만들고, 올린다</em></h1>
+        <p class="lead">Framer 템플릿 하나로 시작해 6개 섹션을 채우고, 휴대폰에서 점검한 뒤, 누구나 열 수 있는 주소와 판넬용 QR 코드까지 만드는 과정입니다.</p>
+        <div class="meta">
+          <span><b>도구</b> Framer 무료 플랜</span>
+          <span><b>분량</b> 2차시 (구축 · 게시)</span>
+          <span><b>결과</b> 공개 URL 1개 + QR 1개</span>
+        </div>
+      </div>
+      <aside class="stack" aria-label="완성할 사이트의 섹션 순서">
+        <span class="label">여러분이 만들 사이트 · 위에서 아래로</span>
+        <ol>
+          <li><b>Hero</b><span>대표 렌더 · 작품명 · 한 줄 컨셉</span></li>
+          <li><b>Video</b><span>5분 영상 (YouTube)</span></li>
+          <li><b>Concept</b><span>컨셉 문장 · 다이어그램</span></li>
+          <li><b>Drawing</b><span>평면 · 단면</span></li>
+          <li><b>Render</b><span>공간 순서대로 렌더</span></li>
+          <li><b>About</b><span>나 · 연락처 · 사용 도구</span></li>
+        </ol>
+        <p>이 페이지도 같은 방식으로 만들었습니다. 위에서 아래로 스크롤하며 따라오세요.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="sheet" id="goal">
+    <div class="wrap">
+      <div class="sheet-no"><div class="num">00</div><span class="label">완성 기준</span></div>
+      <div class="body">
+        <div>
+          <h2>6개 섹션과 5개 조건을 갖추면 완성입니다</h2>
+          <p class="intro">학기 초 수업 안내의 산출물 ③ 웹사이트 조건 그대로입니다. 하나라도 빠지면 미완성으로 봅니다.</p>
+        </div>
+        <div class="grid3">
+          <div class="tile"><span class="label">조건 1</span><h3>공개 URL</h3><p>로그인하지 않은 사람이 휴대폰으로 열 수 있는 주소</p></div>
+          <div class="tile"><span class="label">조건 2</span><h3>모바일 반응형</h3><p>Desktop · Tablet · Phone 세 화면에서 읽힘</p></div>
+          <div class="tile"><span class="label">조건 3</span><h3>영상 자동재생 금지</h3><p>소리는 방문자가 직접 켜게</p></div>
+          <div class="tile"><span class="label">조건 4</span><h3>로딩 5초 이내</h3><p>휴대폰 데이터로 열었을 때 첫 화면 기준</p></div>
+          <div class="tile"><span class="label">조건 5</span><h3>판넬용 QR 코드</h3><p>PNG 1개, 휴대폰 3대 이상에서 인식</p></div>
+          <div class="tile"><span class="label">제출</span><h3>4가지</h3><p>공개 URL · QR 이미지 · PC 첫 화면 캡처 · 휴대폰 첫 화면 캡처</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="prep">
+    <div class="wrap">
+      <div class="sheet-no"><div class="num">01</div><span class="label">자료 준비</span></div>
+      <div class="body">
+        <div>
+          <h2>템플릿을 열기 전에 한 폴더에 모읍니다</h2>
+          <p class="intro">자료 없이 템플릿부터 고치기 시작하면 같은 작업을 두 번 하게 됩니다.</p>
+        </div>
+        <div class="grid2">
+          <div class="tile"><h3>브랜드 시트</h3><p>컬러 3색 HEX 코드, 폰트 2종 이름, 포지셔닝 한 문장</p></div>
+          <div class="tile"><h3>대표 이미지 1장</h3><p>Hero에 쓸 가로 렌더. 가장 자신 있는 컷</p></div>
+          <div class="tile"><h3>렌더 6–12장</h3><p>공간 순서대로 번호를 붙여서</p></div>
+          <div class="tile"><h3>도면 2–4장</h3><p>평면 · 단면 · 다이어그램. 선 두께를 평소보다 굵게 내보내기</p></div>
+          <div class="tile"><h3>영상 링크</h3><p>5분 영상을 YouTube에 일부 공개로 업로드, 퍼가기 허용</p></div>
+          <div class="tile"><h3>About 문장</h3><p>자기소개 2–3줄 + 이메일 · 작품용 인스타그램</p></div>
+        </div>
+        <div>
+          <span class="label">이미지는 올리기 전에 줄입니다</span>
+          <div class="figures" style="margin-top:12px">
+            <div class="fig"><strong>가로 2400px</strong><span>이하로 리사이즈</span></div>
+            <div class="fig"><strong>1MB 안팎</strong><span>한 장 기준 권장 용량</span></div>
+            <div class="fig"><strong>JPG · WebP</strong><span>PNG는 도면 · 로고만</span></div>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="tile">
+            <span class="label">파일 이름 규칙</span>
+            <div class="code">01_hero.jpg  02_lobby.jpg  03_corridor.jpg</div>
+            <p>영문 소문자 · 숫자 · 밑줄만. 한글과 공백은 링크에서 깨질 수 있습니다.</p>
+          </div>
+          <div class="prompt">
+            <span class="label">클로드 코드에 이렇게 요청</span>
+            <p id="prompt-text">이 폴더의 이미지를 가로 2400px로 줄이고 WebP로 변환해줘. 파일 이름은 01_, 02_ 순서 번호를 붙여 영문 소문자로 바꿔줘. 원본은 그대로 두고 새 폴더에 저장해줘.</p>
+            <button class="copy" type="button" data-copy="prompt-text">문장 복사</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="template">
+    <div class="wrap">
+      <div class="sheet-no"><div class="num">02</div><span class="label">템플릿</span></div>
+      <div class="body">
+        <div>
+          <h2>템플릿은 세 가지만 보고 고릅니다</h2>
+          <p class="intro">오래 고르지 않습니다. 지난 차시에 본 무료 템플릿 중 하나를 써도 됩니다.</p>
+        </div>
+        <ol class="steps">
+          <li><div><b>사진이 크게 들어가는가</b><span>첫 화면에 렌더 한 장이 화면을 채우는 구성</span></div></li>
+          <li><div><b>메뉴가 단순한가</b><span>메뉴 4–5개 이하. 6개 섹션과 그대로 맞출 수 있는지</span></div></li>
+          <li><div><b>무료인가</b><span>Free 표시 확인. 유료 템플릿은 구매가 필요</span></div></li>
+        </ol>
+        <div class="grid3">
+          <div class="tile"><span class="label">Free template</span><h3>Forma Interior</h3><p>공간 사진을 크게 보여주는 첫 화면</p></div>
+          <div class="tile"><span class="label">Free template</span><h3>VOLUM</h3><p>건축 사진과 절제된 메뉴 구성</p></div>
+          <div class="tile"><span class="label">Free template</span><h3>ARCHIOR</h3><p>여러 프로젝트를 갤러리로 정리</p></div>
+        </div>
+        <div class="note"><b>복제하기.</b> 템플릿 페이지에서 Remix(복제)를 누르면 내 프로젝트 목록에 복사본이 생깁니다. 원본은 바뀌지 않습니다. 프로젝트 이름은 「작품명_이름」으로 바꿔 둡니다.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="structure">
+    <div class="wrap">
+      <div class="sheet-no"><div class="num">03</div><span class="label">구조</span></div>
+      <div class="body">
+        <div>
+          <h2>한 페이지를 위에서 아래로 걷게 만듭니다</h2>
+          <p class="intro">판넬 QR로 들어온 사람은 휴대폰으로 스크롤만 합니다. 6주차의 '스크롤은 곧 걷기'를 그대로 적용해, 영상과 컨셉으로 들어가 공간을 둘러보고 About에서 나오게 합니다.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>섹션</th><th>넣을 것</th><th>분량</th><th>자주 하는 실수</th></tr></thead>
+            <tbody>
+              <tr><td>Hero</td><td>대표 렌더, 작품명, 한 줄 컨셉, 이름</td><td>이미지 1 · 글 2줄</td><td class="miss">글이 사진의 중요한 부분을 가림</td></tr>
+              <tr><td>Video</td><td>YouTube 영상, 러닝타임</td><td>영상 1</td><td class="miss">자동재생 켜 둠</td></tr>
+              <tr><td>Concept</td><td>컨셉 문장, 컨셉 · 동선 다이어그램</td><td>글 3–4줄 · 이미지 1–2</td><td class="miss">설명이 너무 김</td></tr>
+              <tr><td>Drawing</td><td>평면도, 단면도</td><td>이미지 2–4</td><td class="miss">선이 가늘어 휴대폰에서 안 보임</td></tr>
+              <tr><td>Render</td><td>공간 순서대로 렌더 + 짧은 캡션</td><td>이미지 6–12</td><td class="miss">같은 앵글 반복</td></tr>
+              <tr><td>About</td><td>자기소개, 연락처, 사용한 도구</td><td>글 3줄 · 링크 2–3</td><td class="miss">AI 도구 표기 누락</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">쓰지 않는 템플릿 섹션(Testimonials, Pricing, Blog 등)은 숨기지 말고 <b>삭제</b>합니다. 메뉴 링크는 다른 페이지가 아니라 같은 페이지의 섹션으로 연결합니다. 프로젝트가 두 개 이상인 학생만 상세 페이지를 추가합니다.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="brand">
+    <div class="wrap">
+      <div class="sheet-no"><div class="num">04</div><span class="label">브랜드 적용</span></div>
+      <div class="body">
+        <div>
+          <h2>색과 글꼴은 스타일로 한 번에 바꿉니다</h2>
+          <p class="intro">요소 하나씩 바꾸지 않습니다. 템플릿은 색과 글꼴을 스타일로 묶어 두었기 때문에 스타일만 바꾸면 사이트 전체가 바뀝니다.</p>
+        </div>
+        <ol class="steps">
+          <li><div><b>Assets 패널 열기</b><span>왼쪽 패널에서 Colors · Text 스타일 목록 확인</span></div></li>
+          <li><div><b>Color Style 교체</b><span>주조 · 보조 · 강조 색을 브랜드 시트 HEX로. 비율은 60 · 30 · 10</span></div></li>
+          <li><div><b>Text Style 교체</b><span>제목 · 본문 스타일의 글꼴을 브랜드 폰트 2종으로</span></div></li>
+          <li><div><b>끝까지 스크롤해 확인</b><span>스타일을 쓰는 모든 요소가 함께 바뀌었는지</span></div></li>
+        </ol>
+        <div class="note">강조색은 버튼 · 링크 · 숫자에만 씁니다. 브랜드 폰트가 목록에 없으면 Pretendard, Noto Sans KR처럼 Google Fonts에 있는 한글 글꼴로 대신하고 브랜드 시트도 같은 이름으로 고칩니다. 영상 자막, 숏폼과 같은 색인지가 14주차 브랜드 점검 항목입니다.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="fill">
+    <div class="wrap">
+      <div class="sheet-no"><div class="num">05</div><span class="label">내용 채우기</span></div>
+      <div class="body">
+        <div>
+          <h2>이미지와 글은 이렇게 바꿉니다</h2>
+          <p class="intro">메뉴 위치와 이름은 Framer 업데이트로 바뀔 수 있습니다. 수업 당일 화면을 같이 보며 진행합니다.</p>
+        </div>
+        <div class="grid3">
+          <div class="tile"><span class="label">이미지</span><p>이미지 선택 → 오른쪽 속성 패널의 Fill에서 이미지 교체 → Fit · Fill로 잘림 조정</p></div>
+          <div class="tile"><span class="label">글</span><p>글 상자 더블클릭 → 입력 → 바깥 클릭. 스타일은 Text Style 유지</p></div>
+          <div class="tile"><span class="label">섹션</span><p>왼쪽 Layers에서 선택 → 복제 Ctrl/⌘ + D · 삭제 Delete · 되돌리기 Ctrl/⌘ + Z</p></div>
+        </div>
+        <div>
+          <span class="label">영상은 YouTube로 올리고 연결만 합니다</span>
+          <ol class="steps" style="margin-top:12px">
+            <li><div><b>YouTube 업로드</b><span>공개 범위 '일부 공개', 퍼가기 허용 확인</span></div></li>
+            <li><div><b>Framer에 삽입</b><span>Insert의 Media에서 YouTube 선택 → 영상 주소 붙여넣기</span></div></li>
+            <li><div><b>자동재생 끄기</b><span>Autoplay 해제. 5분 영상 파일을 사이트에 직접 올리면 로딩 5초를 지킬 수 없습니다</span></div></li>
+          </ol>
+        </div>
+        <div class="note warn"><b>자동 저장 ≠ 게시.</b> 작업은 자동 저장되지만, Publish를 누르기 전까지 방문자에게는 보이지 않습니다.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="mobile">
+    <div class="wrap">
+      <div class="sheet-no"><div class="num">06</div><span class="label">휴대폰 점검</span></div>
+      <div class="body">
+        <div>
+          <h2>PC에서 끝난 게 아닙니다. 휴대폰이 기준입니다</h2>
+          <p class="intro">심사위원과 채용담당자는 판넬 QR을 휴대폰으로 찍어 들어옵니다. 화면 상단의 Breakpoint를 바꿔 가며 크기별로 고칩니다. 한 크기에서 고친 글자 크기가 다른 크기에는 적용되지 않을 수 있습니다.</p>
+        </div>
+        <div class="grid2" style="align-items:center">
+          <div class="devices" aria-hidden="true">
+            <div class="dev d"><i></i><b>Desktop</b></div>
+            <div class="dev t"><i></i><b>Tablet</b></div>
+            <div class="dev p"><i></i><b>Phone</b></div>
+          </div>
+          <ol class="steps">
+            <li><div><b>제목이 두 줄 넘게 꺾이지 않는다</b></div></li>
+            <li><div><b>Hero 사진의 중심이 잘리지 않는다</b></div></li>
+            <li><div><b>도면 선과 글씨가 읽힌다</b></div></li>
+            <li><div><b>섹션 순서가 PC와 같다</b></div></li>
+            <li><div><b>메뉴가 햄버거 버튼으로 열린다</b></div></li>
+          </ol>
+        </div>
+        <div class="note">마지막 확인은 반드시 <b>내 휴대폰으로</b> 미리보기 링크를 열어서 합니다.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="settings">
+    <div class="wrap">
+      <div class="sheet-no"><div class="num">07</div><span class="label">Site Settings</span></div>
+      <div class="body">
+        <div>
+          <h2>게시 전에 사이트 정보를 채웁니다</h2>
+          <p class="intro">빼먹으면 카카오톡으로 링크를 보냈을 때 템플릿 제작자의 이름과 샘플 사진이 뜹니다. 가장 많이 나오는 실수입니다.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>항목</th><th>입력할 것</th><th>보이는 곳</th></tr></thead>
+            <tbody>
+              <tr><td>사이트 제목</td><td>작품명 | 이름</td><td>브라우저 탭, 검색 결과</td></tr>
+              <tr><td>설명</td><td>한 줄 컨셉</td><td>카카오톡 · 검색 미리보기의 설명</td></tr>
+              <tr><td>파비콘</td><td>정사각 PNG (브랜드 시그니처)</td><td>브라우저 탭 아이콘</td></tr>
+              <tr><td>소셜 이미지</td><td>1200×630 대표 렌더</td><td>링크 공유 미리보기</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="intro">권장 규격은 Framer 화면의 안내를 우선합니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="publish">
+    <div class="wrap">
+      <div class="sheet-no"><div class="num">08</div><span class="label">게시</span></div>
+      <div class="body">
+        <div>
+          <h2>Publish를 눌러야 세상에 나갑니다</h2>
+        </div>
+        <ol class="steps">
+          <li><div><b>Publish 클릭</b><span>오른쪽 위 버튼</span></div></li>
+          <li><div><b>주소 이름 정하기</b><span>영문 이름 또는 작품명</span></div></li>
+          <li><div><b>게시 완료</b><span>발급된 링크를 휴대폰으로 열어 확인</span></div></li>
+          <li><div><b>고치면 다시 Publish</b><span>누르지 않으면 QR로 들어온 사람은 이전 버전을 봅니다</span></div></li>
+        </ol>
+        <div class="note"><b>무료 플랜으로 충분합니다.</b> 무료 게시는 Framer 주소(예: 이름.framer.website 형식)와 'Made in Framer' 배지가 붙습니다. 개인 도메인 연결과 배지 제거는 유료 플랜이 필요하며 이 수업의 필수 조건이 아닙니다. 주소 형식과 가격은 바뀔 수 있으니 게시 화면의 안내를 기준으로 합니다.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="qr">
+    <div class="wrap">
+      <div class="sheet-no"><div class="num">09</div><span class="label">QR 코드</span></div>
+      <div class="body">
+        <div>
+          <h2>주소를 QR로 바꿔 판넬에 붙입니다</h2>
+          <p class="intro">QR 생성 사이트는 광고가 많고, 일부는 나중에 유료로 바뀌어 QR이 작동하지 않게 만듭니다. Chrome에 있는 기능을 씁니다.</p>
+        </div>
+        <ol class="steps">
+          <li><div><b>Chrome으로 사이트 열기</b><span>게시된 주소로 접속</span></div></li>
+          <li><div><b>QR 코드 만들기</b><span>주소창의 공유 메뉴 → QR 코드 만들기 → 다운로드</span></div></li>
+          <li><div><b>판넬에 배치</b><span>가로 3cm 이상, 주변에 여백</span></div></li>
+          <li><div><b>찍어 보기</b><span>출력 후 휴대폰 3대 이상으로 인식 확인</span></div></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="checklist">
+    <div class="wrap">
+      <div class="sheet-no"><div class="num">✓</div><span class="label">제출 전 점검</span></div>
+      <div class="body">
+        <div>
+          <h2>아홉 개가 모두 체크되면 제출합니다</h2>
+          <p class="intro">체크한 항목은 이 브라우저에만 저장됩니다.</p>
+        </div>
+        <div class="progress">
+          <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+          <output id="count" aria-live="polite">0 / 9</output>
+          <button class="reset" type="button" id="reset">모두 해제</button>
+        </div>
+        <div class="check" id="check">
+          <label><input type="checkbox" id="c1"><span class="box"></span><span>6개 섹션이 순서대로 있다</span></label>
+          <label><input type="checkbox" id="c2"><span class="box"></span><span>템플릿 샘플 글 · 사진이 푸터까지 하나도 남지 않았다</span></label>
+          <label><input type="checkbox" id="c3"><span class="box"></span><span>브랜드 컬러 3색 · 폰트 2종 안에 있다</span></label>
+          <label><input type="checkbox" id="c4"><span class="box"></span><span>영상 자동재생이 꺼져 있다</span></label>
+          <label><input type="checkbox" id="c5"><span class="box"></span><span>휴대폰에서 첫 화면이 5초 안에 뜬다</span></label>
+          <label><input type="checkbox" id="c6"><span class="box"></span><span>제목 · 설명 · 파비콘 · 소셜 이미지를 바꿨다</span></label>
+          <label><input type="checkbox" id="c7"><span class="box"></span><span>마지막 수정 후 다시 Publish 했다</span></label>
+          <label><input type="checkbox" id="c8"><span class="box"></span><span>QR이 휴대폰 3대에서 인식된다</span></label>
+          <label><input type="checkbox" id="c9"><span class="box"></span><span>About에 사용한 AI 도구를 적었다</span></label>
+        </div>
+        <div class="submit">제출: 공개 URL · QR 이미지(PNG) · PC와 휴대폰 첫 화면 캡처 각 1장<span>파일명은 수업 공지의 규칙을 따릅니다.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="faq">
+    <div class="wrap">
+      <div class="sheet-no"><div class="num">?</div><span class="label">문제 해결</span></div>
+      <div class="body">
+        <h2>자주 막히는 곳</h2>
+        <div>
+          <details open><summary>고쳤는데 사이트에 안 보여요</summary><p>Publish를 다시 누르지 않았습니다. 다시 게시한 뒤 새로고침하세요. 질문의 절반이 이것입니다.</p></details>
+          <details><summary>이미지가 안 올라가요</summary><p>용량이 큽니다. 가로 2400px · 1MB 안팎으로 줄여서 다시 올리세요.</p></details>
+          <details><summary>휴대폰에서 글자가 넘쳐요</summary><p>Phone 화면에서 해당 글의 크기를 따로 줄입니다. Desktop에서 고친 값은 Phone에 그대로 적용되지 않을 수 있습니다.</p></details>
+          <details><summary>영상이 재생되지 않아요</summary><p>YouTube 공개 범위가 '일부 공개'인지, 퍼가기 허용이 켜져 있는지 확인하세요.</p></details>
+          <details><summary>카톡 미리보기가 템플릿 그대로예요</summary><p>Site Settings에서 소셜 이미지와 설명을 바꾸고 다시 게시하세요. 카카오톡 쪽 반영에는 시간이 걸릴 수 있습니다.</p></details>
+          <details><summary>버튼 이름이 이 안내와 달라요</summary><p>Framer 업데이트로 메뉴 이름이 바뀌었을 수 있습니다. 수업 중 화면을 기준으로 질문하세요.</p></details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="homework" id="homework">
+    <div class="wrap">
+      <div>
+        <span class="label">이번 주 과제</span>
+        <h2>템플릿 복제 + Hero · Video 두 섹션까지</h2>
+      </div>
+      <div>
+        <ol>
+          <li>01 준비의 자료를 한 폴더에 모으기</li>
+          <li>템플릿을 복제하고 브랜드 색 · 글꼴 적용</li>
+          <li>Hero와 Video 섹션 채우기 (자동재생 끔)</li>
+        </ol>
+        <p style="margin-top:16px">다음 차시에 나머지 섹션, 휴대폰 점검, 게시와 QR까지 함께 마무리합니다.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>호서대학교 실내건축학과 · 2026학년도 2학기 졸업연구 · 검토용 v1 (2026-10-18)</span>
+    <span>Framer 메뉴 이름과 무료 플랜 조건은 2026-10-18에 공개 자료로 확인했으며, 수업 전 실제 화면으로 다시 확인합니다.</span>
+    <ul>
+      <li><a href="https://www.framer.com/ja/academy/lessons/framer-fundamentals-publishing">Framer Academy · Publishing and connecting a domain</a></li>
+      <li><a href="https://www.framer.com/help/articles/how-to-add-icons-and-set-up-a-favicon">Framer Help · Favicon 설정</a></li>
+      <li><a href="https://www.nocode.mba/articles/framer-pricing">Framer 요금제 정리 (nocode.mba)</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var KEY = "wp-checklist-v1";
+  var boxes = Array.prototype.slice.call(document.querySelectorAll("#check input"));
+  var meter = document.getElementById("meter");
+  var count = document.getElementById("count");
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { return {}; } }
+  function save(state) { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  function render() {
+    var n = boxes.filter(function (b) { return b.checked; }).length;
+    meter.style.width = (n / boxes.length * 100) + "%";
+    count.textContent = n + " / " + boxes.length;
+  }
+  var state = load();
+  boxes.forEach(function (b) {
+    b.checked = !!state[b.id];
+    b.addEventListener("change", function () { state[b.id] = b.checked; save(state); render(); });
+  });
+  document.getElementById("reset").addEventListener("click", function () {
+    boxes.forEach(function (b) { b.checked = false; }); state = {}; save(state); render();
+  });
+  render();
+
+  document.querySelectorAll("[data-copy]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var el = document.getElementById(btn.getAttribute("data-copy"));
+      var text = el.textContent;
+      function selectFallback() {
+        var r = document.createRange(); r.selectNodeContents(el);
+        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        btn.textContent = "선택됨 · 복사하세요";
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { btn.textContent = "복사됨"; }, selectFallback);
+      } else { selectFallback(); }
+      setTimeout(function () { btn.textContent = "문장 복사"; }, 2400);
+    });
+  });
+
+  var links = Array.prototype.slice.call(document.querySelectorAll(".nav a"));
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        links.forEach(function (a) {
+          var on = a.getAttribute("href") === "#" + e.target.id;
+          a.classList.toggle("on", on);
+          if (on && a.scrollIntoView) a.parentNode.scrollLeft = a.offsetLeft - 40;
+        });
+      });
+    }, { rootMargin: "-40% 0px -55% 0px" });
+    document.querySelectorAll("section[id]").forEach(function (s) { io.observe(s); });
+  }
+})();
+</script>
